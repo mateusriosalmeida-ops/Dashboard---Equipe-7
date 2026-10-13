@@ -60,3 +60,12 @@ tr.go{cursor:pointer}tr.go:hover td{background:#F5F7F8}td a{color:var(--blue);fo
 .ev button{padding:8px 12px;border:1px dashed #9AA6B0;border-radius:6px;background:#F5F7F8;color:var(--mut);font:inherit;cursor:not-allowed}
 .okm{margin-top:10px;font-size:13.5px;color:#1D5A37;font-weight:500}
 .lnk{background:none;border:0;color:var(--blue);font:inherit;text-decoration:underline;cursor:pointer;padding:9px 4px}
+
+.add,.nf button[type=submit]{padding:9px 14px;border:0;border-radius:6px;background:var(--blue);color:#fff;font:inherit;font-weight:500;cursor:pointer}
+.add{margin-left:auto}.add:hover,.nf button[type=submit]:hover{background:#244A6F}
+.nf{margin-bottom:14px}.nf h3{margin:4px 0 10px;font-size:14px;color:var(--mut)}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:14px}
+.fg label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:500}
+.nf input,.nf select{width:100%;min-width:0;flex:none}
+.act{display:flex;gap:10px;align-items:center}
+#ms:empty{display:none}#ms{margin:0 0 12px}
