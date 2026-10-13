@@ -10,12 +10,16 @@ const alerts=x=>{const a=[];
 const badge=s=>`<span class="b ${{"Ativo":"ok","Em atraso":"crit","Concluído":"neu"}[s]}">${s}</span>`;
 const rule=(m,e,sm)=>`<div class="rule${sm?" sm":""}"><i style="width:${Math.min(m,1)*100}%"></i>${e==null?"":`<s style="left:${Math.min(e,1)*100}%"></s>`}</div>`;
 
+// ---------- contratos adicionados pelo usuário (salvos só neste navegador) ----------
+const KC="sgf-contratos";
+try{JSON.parse(localStorage.getItem(KC)||"[]").forEach(o=>{CONTRATOS.push(o.c);ETAPAS[o.c.id]=o.e})}catch(e){}
+const saveC=()=>{try{localStorage.setItem(KC,JSON.stringify(CONTRATOS.filter(c=>c.novo).map(c=>({c,e:ETAPAS[c.id].map(x=>({n:x.n,un:x.un,c:x.c,m:0,e:0,p:x.p}))}))))}catch(e){}};
+
 // ---------- medições registradas ficam salvas só neste navegador (localStorage) ----------
 const KEY="sgf-medicoes";
 try{Object.entries(JSON.parse(localStorage.getItem(KEY)||"{}")).forEach(([k,v])=>{const[i,j]=k.split("-");if(ETAPAS[i]&&ETAPAS[i][j])Object.assign(ETAPAS[i][j],v)})}catch(e){}
 const save=()=>{try{const s={};for(const i in ETAPAS)ETAPAS[i].forEach((x,j)=>{if(x.ult!=null)s[i+"-"+j]={m:x.m,pend:x.pend,ult:x.ult}});localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}};
 
-// ---------- layout comum: botão de 3 tracinhos, barra lateral e perfil ----------
 const page=document.body.dataset.page;
 const NAV=[["index.html","Dashboard","dashboard"],["contratos.html","Contratos","contratos"],["etapas.html","Etapas e medições","etapas"]];
 document.body.insertAdjacentHTML("afterbegin",`
