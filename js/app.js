@@ -20,6 +20,7 @@ const KEY="sgf-medicoes";
 try{Object.entries(JSON.parse(localStorage.getItem(KEY)||"{}")).forEach(([k,v])=>{const[i,j]=k.split("-");if(ETAPAS[i]&&ETAPAS[i][j])Object.assign(ETAPAS[i][j],v)})}catch(e){}
 const save=()=>{try{const s={};for(const i in ETAPAS)ETAPAS[i].forEach((x,j)=>{if(x.ult!=null)s[i+"-"+j]={m:x.m,pend:x.pend,ult:x.ult}});localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}};
 
+// ---------- layout comum: botão de 3 tracinhos, barra lateral e perfil ----------
 const page=document.body.dataset.page;
 const NAV=[["index.html","Dashboard","dashboard"],["contratos.html","Contratos","contratos"],["etapas.html","Etapas e medições","etapas"]];
 document.body.insertAdjacentHTML("afterbegin",`
@@ -35,6 +36,17 @@ document.addEventListener("keydown",e=>e.key==="Escape"&&tg(false));
 
 // ---------- páginas ----------
 const app=document.getElementById("app");
+const FORM=`<form id="nf" class="card nf" hidden><h2>Novo contrato</h2>
+  <div class="fg"><label>Subempreiteira<input name="sub" required maxlength="60" placeholder="Ex.: Alfa Instalações"></label>
+  <label>Objeto do contrato<input name="obj" required maxlength="90" placeholder="Ex.: Instalações hidráulicas do bloco B"></label>
+  <label>Início<input type="date" name="ini" required></label><label>Término previsto<input type="date" name="fim" required></label></div>
+  <h3>Primeiro serviço contratado</h3>
+  <div class="fg"><label>Serviço / etapa<input name="n" required maxlength="60" placeholder="Ex.: Tubulação em PVC"></label>
+  <label>Unidade<select name="un"><option>m</option><option>m²</option><option>m³</option><option>un</option><option>vb</option></select></label>
+  <label>Quantidade<input type="number" name="c" min="0.01" step="any" required></label>
+  <label>Preço unitário (R$)<input type="number" name="p" min="0.01" step="any" required></label></div>
+  <p class="lg">Valor do contrato: <b id="vp">R$ 0</b></p>
+  <div class="act"><button type="submit">Salvar contrato</button><button type="button" id="cn" class="lnk">Cancelar</button></div></form>`;
 const PAGES={
 dashboard(){
   const at=CONTRATOS.filter(c=>c.status!=="Concluído");
@@ -57,7 +69,7 @@ dashboard(){
 },
 contratos(){
   app.innerHTML=`<h1>Contratos</h1><p class="sub">Subempreiteiras, valores e prazos. Clique em um contrato para ver suas etapas e medições.</p>
-  <div class="tools"><input id="q" type="search" placeholder="Buscar por subempreiteira, código ou objeto"><select id="st"><option value="">Todos os status</option><option>Ativo</option><option>Em atraso</option><option>Concluído</option></select></div>
+  <div class="tools"><input id="q" type="search" placeholder="Buscar por subempreiteira, código ou objeto"><select id="st"><option value="">Todos os status</option><option>Ativo</option><option>Em atraso</option><option>Concluído</option></select><button id="nb" class="add" type="button">+ Novo contrato</button></div>${FORM}<p id="ms" class="okm" role="status"></p>
   <div class="card tbl"><table><thead><tr><th>Código</th><th>Subempreiteira</th><th>Valor contratado</th><th>Medido</th><th>Prazo</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table></div>`;
   const q_=document.getElementById("q"),st=document.getElementById("st"),tb=document.getElementById("tb");
   const draw=()=>{const q=q_.value.toLowerCase(),s=st.value;
@@ -69,6 +81,18 @@ contratos(){
       :`<tr><td colspan="6">Nenhum contrato encontrado. Ajuste a busca ou o filtro.</td></tr>`;};
   tb.onclick=e=>{const r=e.target.closest("tr[data-id]");if(r&&!e.target.closest("a"))location.href="etapas.html?contrato="+r.dataset.id};
   q_.oninput=st.onchange=draw;draw();
+  const nf=document.getElementById("nf"),f=nf.elements,vp=document.getElementById("vp"),ms=document.getElementById("ms");
+  document.getElementById("nb").onclick=()=>{nf.hidden=false;f.sub.focus()};
+  document.getElementById("cn").onclick=()=>{nf.reset();vp.textContent=R(0);nf.hidden=true};
+  nf.oninput=()=>{f.fim.setCustomValidity("");vp.textContent=R((+f.c.value||0)*(+f.p.value||0))};
+  nf.onsubmit=e=>{e.preventDefault();
+    if(f.fim.value<f.ini.value){f.fim.setCustomValidity("O término deve ser igual ou posterior ao início.");f.fim.reportValidity();return}
+    const id=Math.max(...CONTRATOS.map(c=>c.id))+1;
+    const c={id,novo:1,cod:"CT-2026-"+String(id).padStart(3,"0"),sub:f.sub.value.trim(),obj:f.obj.value.trim(),ini:f.ini.value,fim:f.fim.value,
+      status:new Date(f.fim.value+"T00:00")<REF?"Em atraso":"Ativo"};
+    CONTRATOS.push(c);ETAPAS[id]=[{n:f.n.value.trim(),un:f.un.value,c:+f.c.value,m:0,e:0,p:+f.p.value}];saveC();
+    nf.reset();vp.textContent=R(0);nf.hidden=true;q_.value="";st.value="";draw();
+    ms.textContent="Contrato "+c.cod+" adicionado com sucesso.";};
 },
 etapas(){
   app.innerHTML=`<h1>Etapas e medições</h1><p class="sub">Contratado x medido x executado</p>
@@ -91,7 +115,7 @@ etapas(){
   et.onsubmit=e=>{e.preventDefault();const f=e.target,x=ETAPAS[ct.value][+f.dataset.j],v=parseFloat(f.querySelector("input").value);
     if(!(v>0)){f.querySelector("input").focus();return}
     x.m=Math.round((x.m+v)*100)/100;x.ult=v;x.pend=1;save();draw();};
-  document.getElementById("rs").onclick=()=>{try{localStorage.removeItem(KEY)}catch(e){}location.reload()};
+  document.getElementById("rs").onclick=()=>{if(!confirm("Isso apaga as medições registradas e os contratos adicionados. Continuar?"))return;try{localStorage.removeItem(KEY);localStorage.removeItem(KC)}catch(e){}location.reload()};
   ct.onchange=draw;draw();
 }};
 PAGES[page]();
