@@ -69,3 +69,20 @@ tr.go{cursor:pointer}tr.go:hover td{background:#F5F7F8}td a{color:var(--blue);fo
 .nf input,.nf select{width:100%;min-width:0;flex:none}
 .act{display:flex;gap:10px;align-items:center}
 #ms:empty{display:none}#ms{margin:0 0 12px}
+.tt{display:none}.tt.ok,.tt.err{display:block;position:fixed;top:68px;left:50%;transform:translateX(-50%);z-index:50;max-width:min(92vw,560px);padding:10px 16px;border-radius:6px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.18);border-left:5px solid}
+.tt.ok{background:#DDF0E4;color:#1D5A37;border-color:var(--green)}.tt.err{background:#F8DAD7;color:#8C2620;border-color:var(--red)}
+#sb{display:flex;flex-direction:column}
+.sbf{margin-top:auto;display:grid;gap:2px;border-top:1px solid var(--line);padding-top:12px}
+.sbf button{text-align:left;padding:9px 12px;border:0;background:none;font:inherit;border-radius:6px;cursor:pointer;color:var(--ink)}.sbf button:hover{background:var(--bg)}
+.lnk.neg{color:var(--red)}td .lnk{padding:2px 6px}
+.hist{list-style:none;padding:0}.hist li{padding:7px 0;border-bottom:1px solid var(--line)}.hist li:last-child{border:0}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px}.lc{width:100%;max-width:400px}
+.lc label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:500;margin-bottom:12px}.lc input{width:100%;min-width:0;flex:none}
+#er{min-height:22px;margin:0 0 8px;font-weight:500}
+.demo{margin-top:20px;font-size:13px}.demo caption{text-align:left;color:var(--mut);padding-bottom:6px}
+
+.fl{display:block;margin-top:10px;font-size:13px;font-weight:500}.fl input{display:block;margin-top:4px;font:inherit;font-weight:400;width:auto;min-width:0;max-width:100%}
+.th{width:56px;height:56px;object-fit:cover;border-radius:4px;border:1px solid var(--line);cursor:zoom-in;display:block}
+#lb{position:fixed;inset:0;background:rgba(10,18,26,.88);z-index:60;display:grid;place-items:center;padding:16px;cursor:zoom-out}#lb[hidden]{display:none}#lb img{max-width:100%;max-height:100%;border-radius:4px}
+.act .add{margin-left:0}.add.sec{background:#fff;color:var(--blue);border:1px solid var(--blue)}.add.sec:hover{background:#EEF3F8}
+td.n{text-align:right}
